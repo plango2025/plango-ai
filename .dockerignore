@@ -1,0 +1,24 @@
+# 파이썬 캐시
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# 로그 파일
+*.log
+
+# 환경 변수
+.env
+
+# 파이썬 가상환경
+venv/
+
+# Git 관련 파일
+.git
+.gitignore
+
+# Docker 관련 파일
+.dockerignore
+
+# VS Code 관련 파일
+.vscode/
