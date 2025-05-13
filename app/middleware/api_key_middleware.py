@@ -1,5 +1,5 @@
 from fastapi import Request, HTTPException
-from app.config import settings  # 설정 객체 불러오기
+from app.config import settings
 
 
 ALLOWED_PATH_PREFIXES = ["/docs", "/openapi.json"]

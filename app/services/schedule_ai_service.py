@@ -1,6 +1,6 @@
 import textwrap
+import logging as logger
 
-from dotenv import load_dotenv
 from fastapi import HTTPException
 from pydantic import ValidationError
 from openai import OpenAI, OpenAIError
@@ -8,11 +8,12 @@ from openai import OpenAI, OpenAIError
 from app.schemas.schedule_request import ScheduleRequest
 from app.schemas.schedule_response import ScheduleResponse
 
+from app.services.tour_place_service import search_place_info
+
 from app.config import settings
 
-load_dotenv()
-client = OpenAI(api_key=settings.OPENAI_API_KEY)
 
+client = OpenAI(api_key=settings.OPENAI_API_KEY)
 
 async def generate_schedule(request: ScheduleRequest) -> ScheduleResponse:
     """
@@ -77,7 +78,9 @@ async def generate_schedule(request: ScheduleRequest) -> ScheduleResponse:
                   "order": 1,
                   "name": "...",
                   "description": "...",
-                  "image": "https://..."
+                  "image": null,
+                  "latitude": null,
+                  "longitude": null
                 }}
               ]
             }}
@@ -104,15 +107,30 @@ async def generate_schedule(request: ScheduleRequest) -> ScheduleResponse:
             content = content.replace("```", "").strip()
 
         # ScheduleResponse로 파싱
-        return ScheduleResponse.model_validate_json(content)
+        schedule_response = ScheduleResponse.model_validate_json(content)
+
+        # ScheduleResponse의 각 일정에 대해 썸네일 이미지 URL 및 좌표 추가
+        for day in schedule_response.days:
+            for place in day.schedules:
+                # 장소 이름을 사용하여 TourAPI에서 장소 정보 조회
+                place_info = search_place_info(place.name)
+                place.image = place_info.firstimage2 or place_info.firstimage
+                place.latitude = float(place_info.mapy) if place_info.mapy else None
+                place.longitude = float(place_info.mapx) if place_info.mapx else None
+        
+        # 결과 반환
+        return schedule_response
 
     except OpenAIError as e:
         # Bad Gateway (502)
+        logger.error(f"OpenAI API 호출 실패: {str(e)}")
         raise HTTPException(status_code=502, detail=f"OpenAI 호출 실패: {str(e)}")
 
     except ValidationError as e:
         # Bad Gateway (502)
+        logger.error(f"AI 응답 형식 오류: {str(e)}")
         raise HTTPException(status_code=502, detail="AI의 응답 형식이 올바르지 않습니다.")
 
     except Exception as e:
+        logger.error(f"서버 내부 오류: {str(e)}")
         raise HTTPException(status_code=500, detail=f"서버 오류: {str(e)}")
