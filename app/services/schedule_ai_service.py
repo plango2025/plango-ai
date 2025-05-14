@@ -73,7 +73,7 @@ async def generate_schedule(request: ScheduleRequest) -> ScheduleResponse:
           "days": [
             {{
               "day": 1,
-              "schedules": [
+              "places": [
                 {{
                   "order": 1,
                   "name": "...",
@@ -111,7 +111,7 @@ async def generate_schedule(request: ScheduleRequest) -> ScheduleResponse:
 
         # ScheduleResponse의 각 일정에 대해 썸네일 이미지 URL 및 좌표 추가
         for day in schedule_response.days:
-            for place in day.schedules:
+            for place in day.places:
                 # 장소 이름을 사용하여 TourAPI에서 장소 정보 조회
                 place_info = search_place_info(place.name)
                 place.image = place_info.firstimage2 or place_info.firstimage

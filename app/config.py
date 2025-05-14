@@ -4,6 +4,8 @@ class Settings(BaseSettings):
     OPENAI_API_KEY: str
     PLANGO_AI_ACCESS_KEY: str
     TOURAPI_SERVICE_KEY: str
+    MONGO_URI: str
+    MONGO_DB_NAME: str
 
     class Config:
         env_file = ".env"

@@ -2,7 +2,7 @@ from pydantic import BaseModel
 from typing import List, Optional
 
 
-class ScheduleItem(BaseModel):
+class PlaceItem(BaseModel):
     order: Optional[int]            # 순서
     name: Optional[str]             # 장소 이름
     description: Optional[str]      # 장소 설명
@@ -13,7 +13,7 @@ class ScheduleItem(BaseModel):
 
 class DaySchedule(BaseModel):
     day: Optional[int]              # 날짜
-    schedules: List[ScheduleItem]   # 일정 목록
+    places: List[PlaceItem]   # 장소 목록
 
 
 class ScheduleResponse(BaseModel):  

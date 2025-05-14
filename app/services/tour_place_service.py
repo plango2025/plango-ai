@@ -2,6 +2,7 @@ import requests
 
 from fastapi import HTTPException
 from pydantic import ValidationError
+import logging as logger
 
 from app.config import settings
 from app.schemas.tour_keyword_search_response import TourKeywordSearchResponse
@@ -31,6 +32,7 @@ def search_place_info(keyword: str) -> TourKeywordSearchResponse:
 
     # 응답 상태 코드 확인 및 예외 처리
     if response.status_code != 200:
+        logger.error(f"TourAPI 요청 실패: {response.status_code} - {response.text}")
         raise HTTPException(status_code=502, detail="TourAPI 서버 요청 실패")
 
     try:
@@ -50,5 +52,5 @@ def search_place_info(keyword: str) -> TourKeywordSearchResponse:
 
     except (KeyError, IndexError, ValidationError) as e:
         # 응답 파싱 중 오류 발생 시 예외 처리
-        print("얍얍")
+        logger.error(f"TourAPI 응답 파싱 오류: {str(e)}")
         raise HTTPException(status_code=500, detail=f"TourAPI 응답 파싱 실패: {str(e)}")
