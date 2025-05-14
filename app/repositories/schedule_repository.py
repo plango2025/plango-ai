@@ -61,3 +61,5 @@ class ScheduleRepository:
             {"$push": {"feedback_history": feedback}}
         )
         return result.modified_count == 1
+
+schedule_repository = ScheduleRepository()

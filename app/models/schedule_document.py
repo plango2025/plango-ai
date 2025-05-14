@@ -2,13 +2,14 @@ from pydantic import BaseModel, Field
 from typing import List
 from datetime import datetime, timedelta, timezone
 
-from app.schemas import ScheduleRequest, ScheduleResponse
+from app.schemas.schedule import Schedule
+from app.schemas.schedule_request import ScheduleRequest
 
 
 class ScheduleDocument(BaseModel):
     schedule_id: str                                # 일정 ID
     parameters: ScheduleRequest                     # 요청 파라미터
-    schedule: ScheduleResponse                      # 일정 내용
+    schedule: Schedule                              # 일정
     picked_places: List[str] = Field(default_factory=list)      # 고정 장소 이름 리스트
     banned_places: List[str] = Field(default_factory=list)      # 제외 장소 이름 리스트
     feedback_history: List[str] = Field(default_factory=list)   # 유저 피드백 내역
