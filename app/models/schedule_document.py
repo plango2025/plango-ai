@@ -3,7 +3,7 @@ from typing import List
 from datetime import datetime, timedelta, timezone
 
 from app.schemas.schedule import Schedule
-from app.schemas.schedule_request import ScheduleRequest
+from app.schemas.schedule_create_request import ScheduleCreateRequest
 
 from typing import Optional
 
@@ -16,7 +16,7 @@ class ScheduleDocument(BaseModel):
     owner: Optional[str] = None
 
     # 요청 파라미터
-    parameters: ScheduleRequest
+    parameters: ScheduleCreateRequest
 
     # 생성된 일정
     schedule: Schedule

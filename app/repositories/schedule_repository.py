@@ -2,6 +2,7 @@ from pymongo.collection import Collection
 from pymongo import ASCENDING
 from app.db.mongo import db
 from app.models.schedule_document import ScheduleDocument
+from app.schemas.schedule import Schedule
 from typing import Optional
 
 class ScheduleRepository:
@@ -44,6 +45,14 @@ class ScheduleRepository:
             {"$set": {"owner": user_id}}
         )
         return result.modified_count == 1
+    
+    # 일정 설정
+    def update_schedule(self, schedule_id: str, new_schedule: Schedule) -> bool:
+        result = self.collection.update_one(
+            {"schedule_id": schedule_id},
+            {"$set": {"schedule": new_schedule.model_dump()}}
+        )
+        return result.modified_count == 1
 
     
     # pinned_places에 장소 추가
@@ -69,6 +78,7 @@ class ScheduleRepository:
             {"$push": {"feedback_history": feedback}}
         )
         return result.modified_count == 1
+
 
 
 schedule_repository = ScheduleRepository()

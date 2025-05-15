@@ -2,8 +2,9 @@ import uuid
 
 from app.repositories.schedule_repository import ScheduleRepository
 from app.models.schedule_document import ScheduleDocument
-from app.schemas.schedule_request import ScheduleRequest
-from app.schemas.schedule_response import ScheduleResponse
+from app.schemas.schedule_create_request import ScheduleCreateRequest
+from app.schemas.schedule_create_response import ScheduleCreateResponse
+from app.schemas.schedule_feedback_request import ScheduleFeedbackRequest
 from app.services.schedule_ai_service import ScheduleAIService
 
 from app.repositories.schedule_repository import schedule_repository
@@ -22,7 +23,7 @@ class ScheduleService:
         self.schedule_repository = schedule_repository
         self.schedule_ai_service = schedule_ai_service
 
-    async def create_schedule(self, schedule_request: ScheduleRequest) -> ScheduleResponse :
+    async def create_schedule(self, schedule_request: ScheduleCreateRequest) -> ScheduleCreateResponse :
         """
         AI를 통해 여행 일정을 생성하고, MongoDB에 저장합니다.
         TTL은 24시간으로 설정됩니다.
@@ -44,7 +45,7 @@ class ScheduleService:
         # MongoDB에 저장
         self.schedule_repository.save(document)
 
-        schedule_response = ScheduleResponse(
+        schedule_response = ScheduleCreateResponse(
             schedule_id=schedule_id,
             schedule=schedule
         )
@@ -130,6 +131,55 @@ class ScheduleService:
         # 실패 시 에러 처리
         if not owner_update_success or not ttl_removal_success:
             raise HTTPException(status_code=500, detail="일정 보관 처리 중 오류가 발생했습니다.")
+    
+    async def apply_feedback(self, schedule_id: str, request: ScheduleFeedbackRequest) -> ScheduleCreateResponse:
+        """
+        AI를 이용하여 일정에 피드백을 적용합니다.
+        """
+
+        # 입력값 유효성 검사
+        if not schedule_id:
+            raise HTTPException(status_code=400, detail="schedule_id를 입력해주세요.")
+        if not request.feedback:
+            raise HTTPException(status_code=400, detail="feedback 내용을 입력해주세요.")
+
+        # 문서 조회
+        document = self.schedule_repository.find_by_id(schedule_id)
+        if not document:
+            raise HTTPException(status_code=404, detail="존재하지 않는 일정입니다.")
+
+        # 다른 사람의 일정에 접근한 경우 예외 처리
+        if document.owner and document.owner != request.user_id:
+            raise HTTPException(status_code=403, detail="다른 사용자의 일정에는 접근할 수 없습니다.")
+
+        # AI 일정 피드백
+        new_schedule = await self.schedule_ai_service.update_schedule_with_feedback(
+            parameters=document.parameters,
+            schedule=document.schedule,
+            pinned_places=document.pinned_places,
+            banned_places=document.banned_places,
+            new_feedback=request.feedback,
+            feedback_history=document.feedback_history
+        )
+
+        # 새로운 일정 저장
+        self.schedule_repository.update_schedule(
+            schedule_id=schedule_id,
+            new_schedule=new_schedule
+        )
+
+        # 피드백 내역 추가
+        self.schedule_repository.add_feedback(
+            schedule_id=schedule_id,
+            feedback=request.feedback
+        )
+
+        # 수정된 일정 반환
+        return ScheduleCreateResponse(
+            schedule_id=schedule_id,
+            schedule=new_schedule
+        )
+        
 
 
 # 전역 인스턴스 (싱글턴처럼 사용)

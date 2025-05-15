@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field, conint
+from pydantic import BaseModel, Field
 from typing import List, Optional
 
 class Place(BaseModel):
@@ -6,7 +6,7 @@ class Place(BaseModel):
     address: str = Field(description="장소 주소")
 
 
-class ScheduleRequest(BaseModel):
+class ScheduleCreateRequest(BaseModel):
     required_places: Optional[List[Place]] = Field(description="필수 코스")
     destination: Optional[str] = Field(description="여행지")
     duration: Optional[str] = Field(description="여행 기간")
