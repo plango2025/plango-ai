@@ -17,12 +17,12 @@ async def create_ai_schedule(request: ScheduleRequest):
 
 @router.patch("/{schedule_id}/places/pin", status_code=204)
 async def pin_places(schedule_id: str, request: PinPlaceRequest):
-    await schedule_service.pin_places(schedule_id, request.places)
+    await schedule_service.pin_places(schedule_id, request.places, request.user_id)
 
 
 @router.patch("/{schedule_id}/places/ban", status_code=204)
 async def ban_places(schedule_id: str, request: BanPlaceRequest):
-    await schedule_service.ban_places(schedule_id, request.places)
+    await schedule_service.ban_places(schedule_id, request.places, request.user_id)
 
 
 @router.patch("/{schedule_id}/keep", status_code=204)

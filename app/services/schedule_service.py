@@ -10,7 +10,7 @@ from app.repositories.schedule_repository import schedule_repository
 from app.services.schedule_ai_service import schedule_ai_service
 
 from fastapi import HTTPException
-from typing import List
+from typing import List, Optional
 
 
 class ScheduleService:
@@ -52,29 +52,47 @@ class ScheduleService:
         # 일정 응답 반환        
         return schedule_response
 
-    async def pin_places(self, schedule_id: str, places: List[str]) -> None:
+    async def pin_places(self, schedule_id: str, places: List[str], user_id: Optional[str]) -> None:
         """
         고정 장소를 추가합니다.
         """
+
+        # 문서 조회
+        document = self.schedule_repository.find_by_id(schedule_id)
+        if not document:
+            raise HTTPException(status_code=404, detail="존재하지 않는 일정입니다.")
+
+        # 다른 사람의 일정에 접근한 경우 예외 처리
+        if document.owner and document.owner != user_id:
+            raise HTTPException(status_code=403, detail="다른 사용자의 일정에는 접근할 수 없습니다.")
 
         # document에 고정 장소 추가
         success = self.schedule_repository.add_pinned_places(schedule_id, places)
 
         # 성공 여부 확인
         if not success:
-            raise HTTPException(status_code=404, detail=f"일정을 찾을 수 없습니다.")
+            raise HTTPException(status_code=404, detail=f"존재하지 않는 일정입니다.")
 
-    async def ban_places(self, schedule_id: str, places: List[str]) -> None:
+    async def ban_places(self, schedule_id: str, places: List[str], user_id: Optional[str]) -> None:
         """
         제외 장소를 추가합니다.
         """
+
+        # 문서 조회
+        document = self.schedule_repository.find_by_id(schedule_id)
+        if not document:
+            raise HTTPException(status_code=404, detail="존재하지 않는 일정입니다.")
+
+        # 다른 사람의 일정에 접근한 경우 예외 처리
+        if document.owner and document.owner != user_id:
+            raise HTTPException(status_code=403, detail="다른 사용자의 일정에는 접근할 수 없습니다.")
 
         # document에 제외 장소 추가
         success = self.schedule_repository.add_banned_places(schedule_id, places)
 
         # 성공 여부 확인
         if not success:
-            raise HTTPException(status_code=404, detail=f"일정을 찾을 수 없습니다.")
+            raise HTTPException(status_code=404, detail=f"존재하지 않는 일정입니다.")
 
     async def keep_schedule(self, schedule_id: str, user_id: str) -> None:
         """
@@ -90,7 +108,7 @@ class ScheduleService:
         # 문서 조회
         document = self.schedule_repository.find_by_id(schedule_id)
         if not document:
-            raise HTTPException(status_code=404, detail="해당 일정이 존재하지 않습니다.")
+            raise HTTPException(status_code=404, detail="존재하지 않는 일정입니다.")
 
         # 이미 보관된 일정인 경우 바로 나가기
         if document.owner == user_id and not document.expires_at:
