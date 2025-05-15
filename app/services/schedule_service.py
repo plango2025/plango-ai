@@ -9,6 +9,9 @@ from app.services.schedule_ai_service import ScheduleAIService
 from app.repositories.schedule_repository import schedule_repository
 from app.services.schedule_ai_service import schedule_ai_service
 
+from fastapi import HTTPException
+from typing import List
+
 
 class ScheduleService:
     def __init__(
@@ -37,21 +40,42 @@ class ScheduleService:
             parameters=schedule_request,
             schedule=schedule
         )
-        print(document)
 
         # MongoDB에 저장
         self.schedule_repository.save(document)
-
-        print("schedule type:", type(schedule))
 
         schedule_response = ScheduleResponse(
             schedule_id=schedule_id,
             schedule=schedule
         )
-        print(schedule_response)
         
         # 일정 응답 반환        
         return schedule_response
+
+    async def pin_places(self, schedule_id: str, places: List[str]) -> None:
+        """
+        고정 장소를 추가합니다.
+        """
+
+        # document에 고정 장소 추가
+        success = self.schedule_repository.add_pinned_places(schedule_id, places)
+
+        # 성공 여부 확인
+        if not success:
+            raise HTTPException(status_code=404, detail=f"Schedule '{schedule_id}' not found.")
+
+    async def ban_places(self, schedule_id: str, places: List[str]) -> None:
+        """
+        제외 장소를 추가합니다.
+        """
+
+        # document에 제외 장소 추가
+        success = self.schedule_repository.add_banned_places(schedule_id, places)
+
+        # 성공 여부 확인
+        if not success:
+            raise HTTPException(status_code=404, detail=f"Schedule '{schedule_id}' not found.")
+
 
 # 전역 인스턴스 (싱글턴처럼 사용)
 schedule_service = ScheduleService(

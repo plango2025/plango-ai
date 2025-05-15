@@ -36,23 +36,22 @@ class ScheduleRepository:
             {"$unset": {"expires_at": ""}}
         )
         return result.modified_count == 1
-
-
-    # pick 장소 추가
-    def add_picked_place(self, schedule_id: str, place_name: str) -> bool:
+    
+    # pinned_places에 장소 추가
+    def add_pinned_places(self, schedule_id: str, place_names: list[str]) -> bool:
         result = self.collection.update_one(
             {"schedule_id": schedule_id},
-            {"$addToSet": {"picked_places": place_name}}  # 중복 방지
+            {"$addToSet": {"pinned_places": {"$each": place_names}}}
         )
-        return result.modified_count == 1
+        return result.matched_count == 1
 
-    # ban 장소 추가
-    def add_banned_place(self, schedule_id: str, place_name: str) -> bool:
+    # banned_places에 장소 추가
+    def add_banned_places(self, schedule_id: str, place_names: list[str]) -> bool:
         result = self.collection.update_one(
             {"schedule_id": schedule_id},
-            {"$addToSet": {"banned_places": place_name}}  # 중복 방지
+            {"$addToSet": {"banned_places": {"$each": place_names}}}
         )
-        return result.modified_count == 1
+        return result.matched_count == 1
 
     # 피드백 내역 추가
     def add_feedback(self, schedule_id: str, feedback: str) -> bool:
@@ -61,5 +60,6 @@ class ScheduleRepository:
             {"$push": {"feedback_history": feedback}}
         )
         return result.modified_count == 1
+
 
 schedule_repository = ScheduleRepository()

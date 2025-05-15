@@ -10,7 +10,7 @@ class ScheduleDocument(BaseModel):
     schedule_id: str                                # 일정 ID
     parameters: ScheduleRequest                     # 요청 파라미터
     schedule: Schedule                              # 일정
-    picked_places: List[str] = Field(default_factory=list)      # 고정 장소 이름 리스트
+    pinned_places: List[str] = Field(default_factory=list)      # 고정 장소 이름 리스트
     banned_places: List[str] = Field(default_factory=list)      # 제외 장소 이름 리스트
     feedback_history: List[str] = Field(default_factory=list)   # 유저 피드백 내역
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))    # 생성일
