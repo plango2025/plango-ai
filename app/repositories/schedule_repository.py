@@ -33,9 +33,18 @@ class ScheduleRepository:
     def remove_ttl(self, schedule_id: str) -> bool:
         result = self.collection.update_one(
             {"schedule_id": schedule_id},
-            {"$unset": {"expires_at": ""}}
+            {"$set": {"expires_at": None}}
         )
         return result.modified_count == 1
+
+    # 일정 소유자 설정
+    def set_owner(self, schedule_id: str, user_id: str) -> bool:
+        result = self.collection.update_one(
+            {"schedule_id": schedule_id},
+            {"$set": {"owner": user_id}}
+        )
+        return result.modified_count == 1
+
     
     # pinned_places에 장소 추가
     def add_pinned_places(self, schedule_id: str, place_names: list[str]) -> bool:

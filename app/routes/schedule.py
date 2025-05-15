@@ -1,4 +1,4 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Body
 
 from app.schemas.schedule_request import ScheduleRequest
 from app.schemas.schedule_response import ScheduleResponse
@@ -15,11 +15,16 @@ async def create_ai_schedule(request: ScheduleRequest):
     return await schedule_service.create_schedule(request)
 
 
-@router.post("/{schedule_id}/places/pin", status_code=204)
+@router.patch("/{schedule_id}/places/pin", status_code=204)
 async def pin_places(schedule_id: str, request: PinPlaceRequest):
     await schedule_service.pin_places(schedule_id, request.places)
 
 
-@router.post("/{schedule_id}/places/ban", status_code=204)
+@router.patch("/{schedule_id}/places/ban", status_code=204)
 async def ban_places(schedule_id: str, request: BanPlaceRequest):
     await schedule_service.ban_places(schedule_id, request.places)
+
+
+@router.patch("/{schedule_id}/keep", status_code=204)
+async def keep_schedule(schedule_id: str, user_id: str = Body(..., embed=True)):
+    await schedule_service.keep_schedule(schedule_id, user_id)

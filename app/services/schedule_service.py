@@ -62,7 +62,7 @@ class ScheduleService:
 
         # 성공 여부 확인
         if not success:
-            raise HTTPException(status_code=404, detail=f"Schedule '{schedule_id}' not found.")
+            raise HTTPException(status_code=404, detail=f"일정을 찾을 수 없습니다.")
 
     async def ban_places(self, schedule_id: str, places: List[str]) -> None:
         """
@@ -74,7 +74,44 @@ class ScheduleService:
 
         # 성공 여부 확인
         if not success:
-            raise HTTPException(status_code=404, detail=f"Schedule '{schedule_id}' not found.")
+            raise HTTPException(status_code=404, detail=f"일정을 찾을 수 없습니다.")
+
+    async def keep_schedule(self, schedule_id: str, user_id: str) -> None:
+        """
+        일정을 보관합니다.
+        """
+
+        # 유효성 검사
+        if not schedule_id:
+            raise HTTPException(status_code=400, detail="schedule_id를 입력해주세요.")
+        if not user_id:
+            raise HTTPException(status_code=400, detail="user_id를 입력해주세요.")
+
+        # 문서 조회
+        document = self.schedule_repository.find_by_id(schedule_id)
+        if not document:
+            raise HTTPException(status_code=404, detail="해당 일정이 존재하지 않습니다.")
+
+        # 이미 보관된 일정인 경우 바로 나가기
+        if document.owner == user_id and not document.expires_at:
+            return
+
+        # 다른 사람의 일정에 접근한 경우 예외 처리
+        if document.owner and document.owner != user_id:
+            raise HTTPException(status_code=403, detail="다른 사용자의 일정에는 접근할 수 없습니다.")
+
+        # 소유자 설정
+        owner_update_success = self.schedule_repository.set_owner(schedule_id, user_id)
+
+        # 만료 제거
+        ttl_removal_success = self.schedule_repository.remove_ttl(schedule_id)
+
+        # 디버깅 용 출력
+        document = self.schedule_repository.find_by_id(schedule_id)
+
+        # 실패 시 에러 처리
+        if not owner_update_success or not ttl_removal_success:
+            raise HTTPException(status_code=500, detail="일정 보관 처리 중 오류가 발생했습니다.")
 
 
 # 전역 인스턴스 (싱글턴처럼 사용)
