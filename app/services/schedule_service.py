@@ -179,7 +179,45 @@ class ScheduleService:
             schedule_id=schedule_id,
             schedule=new_schedule
         )
+
+    async def recreate_schedule(self, schedule_id: str, user_id: Optional[str]) -> ScheduleCreateResponse:
+        """
+        기존 일정 설정 정보를 바탕으로 새로운 일정을 생성합니다.
+        """
+
+        # 입력값 유효성 검사
+        if not schedule_id:
+            raise HTTPException(status_code=400, detail="schedule_id를 입력해주세요.")
+
+        # 문서 조회
+        document = self.schedule_repository.find_by_id(schedule_id)
+        if not document:
+            raise HTTPException(status_code=404, detail="존재하지 않는 일정입니다.")
         
+        # 다른 사람의 일정에 접근한 경우 예외 처리
+        if document.owner and document.owner != user_id:
+            raise HTTPException(status_code=403, detail="다른 사용자의 일정에는 접근할 수 없습니다.")
+        
+        # AI 일정 재생성
+        new_schedule = await self.schedule_ai_service.regenerate_schedule(
+            parameters=document.parameters,
+            pinned_places=document.pinned_places,
+            banned_places=document.banned_places,
+            feedback_history=document.feedback_history
+        )
+
+        # 새로운 일정 저장
+        self.schedule_repository.update_schedule(
+            schedule_id=schedule_id,
+            new_schedule=new_schedule
+        )
+
+        # 재생성된 일정 반환
+        return ScheduleCreateResponse(
+            schedule_id=schedule_id,
+            schedule=new_schedule
+        )
+
 
 
 # 전역 인스턴스 (싱글턴처럼 사용)

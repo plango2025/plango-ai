@@ -8,6 +8,9 @@ from app.schemas.schedule_feedback_request import ScheduleFeedbackRequest
 
 from app.services.schedule_service import schedule_service
 
+from typing import Optional
+
+
 router = APIRouter(prefix="/api/schedules")
 
 
@@ -34,3 +37,7 @@ async def keep_schedule(schedule_id: str, user_id: str = Body(..., embed=True)):
 @router.patch("/{schedule_id}/feedback", response_model=ScheduleCreateResponse, status_code=200)
 async def give_schedule_feedback(schedule_id: str, request: ScheduleFeedbackRequest):
     return await schedule_service.apply_feedback(schedule_id, request)
+
+@router.patch("/{schedule_id}/recreate", response_model=ScheduleCreateResponse, status_code=200)
+async def recreate_schedule(schedule_id: str, user_id: Optional[str] = Body(None, embed=True)):
+    return await schedule_service.recreate_schedule(schedule_id, user_id)
