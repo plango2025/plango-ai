@@ -1,5 +1,5 @@
 from fastapi import Request, HTTPException
-from app.config import settings
+from app.config.settings import settings
 
 
 ALLOWED_PATH_PREFIXES = ["/docs", "/openapi.json"]
