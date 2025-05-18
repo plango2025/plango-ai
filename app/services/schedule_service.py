@@ -125,9 +125,6 @@ class ScheduleService:
         # 만료 제거
         ttl_removal_success = self.schedule_repository.remove_ttl(schedule_id)
 
-        # 디버깅 용 출력
-        document = self.schedule_repository.find_by_id(schedule_id)
-
         # 실패 시 에러 처리
         if not owner_update_success or not ttl_removal_success:
             raise HTTPException(status_code=500, detail="일정 보관 처리 중 오류가 발생했습니다.")
