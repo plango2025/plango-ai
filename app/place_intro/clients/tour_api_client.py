@@ -16,7 +16,7 @@ from app.config.settings import settings
 BASE_URL = settings.TOURAPI_BASE_URL
 SERVICE_KEY = settings.TOURAPI_KEY
 DECODED_SERVICE_KEY = unquote(SERVICE_KEY)
-TIMEOUT = settings.timeout
+TIMEOUT = settings.TIMEOUT
 
 
 from app.place_intro.schemas.api.keyword_search_info import KeywordSearchItem
