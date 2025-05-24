@@ -47,13 +47,12 @@ jobs:
             # 2. .env 파일 생성 (GitHub Secrets → 서버 파일로)
             echo "${{ secrets.ENV_FILE }}" > .env
 
-            # 3. Docker 이미지 pull & 컨테이너 재시작
-            docker pull teniuscom/plango-ai:latest
-            docker stop plango-ai || true
-            docker rm plango-ai || true
+            # 3. docker-compose.yml 저장
+            echo "${{ secrets.DOCKER_COMPOSE }}" > docker-compose.yml
 
-            docker run -d \
-              --name plango-ai \
-              --env-file .env \
-              -p 8000:8000 \
-              teniuscom/plango-ai:latest
+            # 4. docker 이미지 pull
+            docker pull teniuscom/plango-ai:latest
+
+            # 5. 서비스 재시작
+            docker compose down || true
+            docker compose up -d
