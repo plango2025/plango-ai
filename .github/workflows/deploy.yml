@@ -56,5 +56,4 @@ jobs:
               --name plango-ai \
               --env-file .env \
               -p 8000:8000 \
-              -v /home/ubuntu/plango-ai:/app \
               teniuscom/plango-ai:latest
