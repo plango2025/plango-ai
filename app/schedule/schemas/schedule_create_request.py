@@ -9,7 +9,7 @@ class Place(BaseModel):
 class ScheduleCreateRequest(BaseModel):
     required_places: Optional[List[Place]] = Field(description="필수 코스")
     destination: Optional[str] = Field(description="여행지")
-    duration: Optional[str] = Field(description="여행 기간")
+    duration: Optional[int] = Field(description="여행 기간")
     companion: Optional[str] = Field(description="동행자")
     style: Optional[str] = Field(description="여행 스타일")
     schedule_count: Optional[int] = Field(description="(하루 당) 일정 개수")
