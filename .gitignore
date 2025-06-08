@@ -11,3 +11,9 @@ venv/
 
 # 기타 개발 중 생성될 수 있는 파일들
 *.log
+
+# 크롤링 데이터
+crawled_data/
+
+# 벡터 DB 데이터
+chroma_db/
