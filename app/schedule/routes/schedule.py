@@ -5,6 +5,7 @@ from app.schedule.schemas.schedule_create_response import ScheduleCreateResponse
 from app.schedule.schemas.pin_place_request import PinPlaceRequest
 from app.schedule.schemas.ban_place_request import BanPlaceRequest
 from app.schedule.schemas.schedule_feedback_request import ScheduleFeedbackRequest
+from app.schedule.schemas.schedule_read_response import ScheduleReadResponse
 
 from app.schedule.services.schedule_service import schedule_service
 
@@ -42,3 +43,7 @@ async def give_schedule_feedback(schedule_id: str, request: ScheduleFeedbackRequ
 @router.patch("/{schedule_id}/recreate", response_model=ScheduleCreateResponse, status_code=200)
 async def recreate_schedule(schedule_id: str, user_id: Optional[str] = Body(None, embed=True)):
     return await schedule_service.recreate_schedule(schedule_id, user_id)
+
+@router.get("/{schedule_id}", response_model=ScheduleReadResponse, status_code=200)
+async def read_schedule(schedule_id: str):
+    return await schedule_service.get_schedule(schedule_id)

@@ -10,6 +10,8 @@ from app.schedule.services.schedule_ai_service import ScheduleAIService
 from app.schedule.repositories.schedule_repository import schedule_repository
 from app.schedule.services.schedule_ai_service import schedule_ai_service
 
+from app.schedule.schemas.schedule_read_response import ScheduleReadResponse
+
 from fastapi import HTTPException
 from typing import List, Optional
 
@@ -213,6 +215,27 @@ class ScheduleService:
         return ScheduleCreateResponse(
             schedule_id=schedule_id,
             schedule=new_schedule
+        )
+
+    async def get_schedule(self, schedule_id: str) -> ScheduleReadResponse:
+        """
+        일정 ID로 일정을 조회합니다.
+        """
+
+        # 입력값 유효성 검사
+        if not schedule_id:
+            raise HTTPException(status_code=400, detail="schedule_id를 입력해주세요.")
+
+        # 문서 조회
+        document = self.schedule_repository.find_by_id(schedule_id)
+        if not document:
+            raise HTTPException(status_code=404, detail="존재하지 않는 일정입니다.")
+
+        # 일정 응답 반환
+        return ScheduleReadResponse(
+            schedule_id=document.schedule_id,
+            schedule=document.schedule,
+            parameters=document.parameters
         )
 
 

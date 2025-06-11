@@ -5,7 +5,6 @@ class Place(BaseModel):
     name: str = Field(description="장소 이름")
     address: str = Field(description="장소 주소")
 
-
 class ScheduleCreateRequest(BaseModel):
     required_places: Optional[List[Place]] = Field(description="필수 코스")
     destination: Optional[str] = Field(description="여행지")
