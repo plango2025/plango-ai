@@ -13,10 +13,11 @@ class VectorStoreManager:
         self.embeddings = HuggingFaceEmbeddings(model_name=embedding_model_name)
         self.client = chromadb.PersistentClient(path=self.chroma_db_path)
         self.vectorstore = self._load_or_create_vectorstore(documents)
+        
 
     def _load_or_create_vectorstore(self, documents: List[Document] = None):
         print(f"ChromaDB 컬렉션 '{self.collection_name}' 로드 또는 생성 시도 중...")
-        
+
         try:
             # 기존 컬렉션 로드 시도
             # Chroma.from_existing_persist_dir은 실제 파일 시스템에 컬렉션이 존재하는지 확인합니다.
@@ -44,6 +45,20 @@ class VectorStoreManager:
             batch_size = 1000 # 한 번에 처리할 문서 수
             num_documents = len(documents)
             
+            # 100개만 처리하는 코드 (테스트 용도)
+            if num_documents > 0:
+                limit = min(100, num_documents)
+                print(f"총 {num_documents}개 문서 중 {limit}개만 벡터스토어에 저장합니다.")
+                vectorstore = Chroma.from_documents(
+                    documents=documents[:limit],
+                    embedding=self.embeddings,
+                    persist_directory=self.chroma_db_path,
+                    collection_name=self.collection_name,
+                    client=self.client
+                )
+                print(f"{limit}개 문서 처리 완료.")
+            
+            """
             # 첫 번째 배치로 ChromaDB를 초기화 (from_documents)
             # 이렇게 하면 초기화 시 자동으로 add_documents를 호출합니다.
             if num_documents > 0:
@@ -75,6 +90,7 @@ class VectorStoreManager:
                 print(f"배치 {current_batch_num}/{total_batches} - {i}/{num_documents} 문서 처리 중...")
                 vectorstore.add_documents(batch)
                 print(f"배치 {current_batch_num}/{total_batches} - {min(i + batch_size, num_documents)}/{num_documents} 문서 처리 완료.")
+            """
             
             print(f"총 {vectorstore._collection.count()}개의 문서로 컬렉션 '{self.collection_name}' 생성 완료.")
             return vectorstore
@@ -113,15 +129,10 @@ class VectorStoreManager:
         return docs
 
 
-# 싱글턴 인스턴스 생성
-vector_store = VectorStoreManager(
-    chroma_db_path = os.path.abspath(os.path.join(os.path.dirname(__file__), 'chroma_db'))
-)
-
 # 이 파일을 직접 실행하여 ChromaDB 컬렉션을 생성/로드하는 코드 (최초 실행 시 반드시 필요)
 if __name__ == "__main__":
     current_dir = os.path.dirname(__file__)
-    data_file_path = os.path.abspath(os.path.join(current_dir, 'crawled_data', 'public_tourism_data.jsonl')) # 경로 수정됨
+    data_file_path = os.path.abspath(os.path.join(current_dir, 'crawling_data', 'public_tourism_data.jsonl')) # 경로 수정됨
     chroma_db_dir = os.path.abspath(os.path.join(current_dir, 'chroma_db')) # ChromaDB 저장 폴더 이름 변경
 
     print("\n--- ChromaDB 컬렉션 생성/로드 프로세스 시작 ---")
@@ -155,4 +166,10 @@ if __name__ == "__main__":
                 print(f"내용 일부: {doc.page_content[:100]}...")
                 print("-" * 20)
         else:
-            print("ChromaDB에 문서가 없어 리트리버 테스트를 건너뜝니다.")
+            print("ChromaDB에 문서가 없어 리트리버 테스트를 건너뜁니다.")
+            
+            
+ # 싱글턴 인스턴스 생성
+vector_store = VectorStoreManager(
+    chroma_db_path = os.path.abspath(os.path.join(os.path.dirname(__file__), 'chroma_db'))
+)

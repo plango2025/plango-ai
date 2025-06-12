@@ -12,9 +12,14 @@ def load_tourism_documents(file_path: str) -> List[Document]:
             for line in f:
                 data = json.loads(line.strip())
                 
-                # 'outl' 필드가 문서의 주요 내용이 됩니다.
-                page_content = str(data.get('outl') or '')
-                
+                # page_content에 주요 필드 모두 포함
+                page_content = (
+                    f"title: {data.get('title', 'N/A')}\n"
+                    f"address: {data.get('addr1', 'N/A')}\n"
+                    f"contentType: {data.get('content_type', 'N/A')}\n"
+                    f"content: {data.get('outl', '')}"
+                )
+                               
                 # 메타데이터를 구성합니다.
                 metadata = {
                     "title": data.get('title', 'N/A'),
@@ -51,7 +56,7 @@ if __name__ == "__main__":
     current_dir = os.path.dirname(__file__)
     # public_tourism_data.jsonl 파일의 절대 경로
     # 예시: app/schedule/rag/crawled_data/public_tourism_data.jsonl
-    data_file_path = os.path.abspath(os.path.join(current_dir, 'crawled_data', 'public_tourism_data.jsonl'))
+    data_file_path = os.path.abspath(os.path.join(current_dir, 'crawling_data', 'public_tourism_data.jsonl'))
 
     print(f"데이터 파일 경로: {data_file_path}")
 
