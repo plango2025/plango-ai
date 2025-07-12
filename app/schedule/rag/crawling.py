@@ -98,7 +98,7 @@ headers = {
 current_script_dir = os.path.dirname(os.path.abspath(__file__))
 
 # 최종 데이터 저장 경로 설정: app/schedule/rag/crawled_data/
-output_dir = os.path.join(current_script_dir, "crawled_data")
+output_dir = os.path.join(current_script_dir, "crawling_data")
 
 # 디렉토리가 없으면 생성
 os.makedirs(output_dir, exist_ok=True)
