@@ -39,6 +39,8 @@ async def search_keyword(keyword: str, num_of_rows: int = 2) -> list[KeywordSear
         )
         response.raise_for_status()
         print(response.request.url)
+
+        print("응답 본문:", response.text)
         data = response.json()
 
     try:

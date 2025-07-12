@@ -1,7 +1,6 @@
 from pymongo import MongoClient
 from app.config.settings import settings
 
-
 # MongoClient 싱글턴 객체
 client = MongoClient(settings.MONGO_URI)
 

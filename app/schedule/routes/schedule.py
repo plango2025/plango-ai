@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Body
+from fastapi import APIRouter, Body, Query
 
 from app.schedule.schemas.schedule_create_request import ScheduleCreateRequest
 from app.schedule.schemas.schedule_create_response import ScheduleCreateResponse
@@ -6,6 +6,7 @@ from app.schedule.schemas.pin_place_request import PinPlaceRequest
 from app.schedule.schemas.ban_place_request import BanPlaceRequest
 from app.schedule.schemas.schedule_feedback_request import ScheduleFeedbackRequest
 from app.schedule.schemas.schedule_read_response import ScheduleReadResponse
+from app.schedule.schemas.schedule_thumbnail_list import ScheduleThumbnailList
 
 from app.schedule.services.schedule_service import schedule_service
 
@@ -47,3 +48,7 @@ async def recreate_schedule(schedule_id: str, user_id: Optional[str] = Body(None
 @router.get("/{schedule_id}", response_model=ScheduleReadResponse, status_code=200)
 async def read_schedule(schedule_id: str):
     return await schedule_service.get_schedule(schedule_id)
+
+@router.get("", response_model=ScheduleThumbnailList, status_code=200)
+async def read_schedules(user_id: Optional[str] = Query(None, description="유저 ID")):
+    return ScheduleThumbnailList(data=await schedule_service.get_schedules_by_user_id(user_id))

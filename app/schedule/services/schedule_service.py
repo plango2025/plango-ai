@@ -11,6 +11,7 @@ from app.schedule.repositories.schedule_repository import schedule_repository
 from app.schedule.services.schedule_ai_service import schedule_ai_service
 
 from app.schedule.schemas.schedule_read_response import ScheduleReadResponse
+from app.schedule.schemas.schedule_thumbnail import ScheduleThumbnail
 
 from fastapi import HTTPException
 from typing import List, Optional
@@ -237,7 +238,36 @@ class ScheduleService:
             schedule=document.schedule,
             parameters=document.parameters
         )
+    
+    async def get_schedules_by_user_id(self, user_id: str) -> list[ScheduleThumbnail]:
+        """
+        사용자 ID로 사용자의 일정을 조회합니다.
+        """
 
+        # 입력값 유효성 검사
+        if not user_id:
+            raise HTTPException(status_code=400, detail="user_id를 입력해주세요.")
+
+        # 사용자 일정 조회
+        documents = self.schedule_repository.find_by_user_id(user_id)
+
+        # 일정이 없는 경우 빈 리스트 반환
+        if not documents:
+            return []
+
+        # ScheduleThumbnail 리스트 생성
+        thumbnails = [
+            ScheduleThumbnail(
+                schedule_id=document.schedule_id,
+                created_at=document.created_at.isoformat(),
+                title=document.schedule.title,
+                thumbnail_url="https://search.pstatic.net/sunny/?src=https%3A%2F%2Ft1.daumcdn.net%2Fcafeattach%2FFdgB%2Fa6d422211e2750287e554ad5cc4a2a3436ee227b&type=sc960_832",
+                destination=document.parameters.destination or "",
+                duration=f"{document.parameters.duration-1}박 {document.parameters.duration}일" if document.parameters.duration > 1 else "당일치기"
+            ) for document in documents
+        ]
+
+        return thumbnails
 
 
 # 전역 인스턴스 (싱글턴처럼 사용)

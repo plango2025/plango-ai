@@ -17,4 +17,4 @@ app.middleware("http")(verify_api_key_middleware)
 
 # 라우터 등록
 app.include_router(schedule.router)
-app.include_router(tour.router, prefix="/v1", tags=["Tour"])
+app.include_router(tour.router)

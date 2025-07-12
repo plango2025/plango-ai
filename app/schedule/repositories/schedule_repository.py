@@ -25,6 +25,11 @@ class ScheduleRepository:
         doc = self.collection.find_one({"schedule_id": schedule_id})
         return ScheduleDocument(**doc) if doc else None
 
+    # 사용자 ID로 조회
+    def find_by_user_id(self, user_id: str) -> list[ScheduleDocument]:
+        docs = self.collection.find({"owner": user_id})
+        return [ScheduleDocument(**doc) for doc in docs]
+
     # 일정 ID로 삭제
     def delete_by_id(self, schedule_id: str) -> bool:
         result = self.collection.delete_one({"schedule_id": schedule_id})

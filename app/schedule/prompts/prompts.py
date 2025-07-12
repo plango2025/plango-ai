@@ -90,40 +90,32 @@ GENERATE_SCHEDULE_PROMPT_TEMPLATE = """
       "places": [
         {{
           "order": 1,
-          "name": "강릉역",
-          "description": "강릉 여행의 시작과 끝, 연인과 함께 설레는 마음으로 바다로 향하는 관문 강릉역에서 첫 인증샷을 남겨보세요.",
+          "name": "강릉 중앙시장",
+          "description": "강릉 대표 간식거리가 모두 모여있는 전통 시장",
           "image": null,
           "latitude": null,
           "longitude": null
         }},
         {{
           "order": 2,
-          "name": "강릉 중앙시장",
-          "description": "강릉 대표 간식거리가 모두 모여있는 전통 시장! 다양한 먹거리를 맛보며 연인과 즐거운 추억을 만들고, 시장 특유의 활기찬 분위기 속에서 자연스러운 스냅샷을 건져보세요.",
+          "name": "안목 해변",
+          "description": "강릉 커피 거리가 위치한 강릉의 대표 해변",
           "image": null,
           "latitude": null,
           "longitude": null
         }},
         {{
           "order": 3,
-          "name": "안목 해변",
-          "description": "강릉 커피 거리가 위치한 강릉의 대표 해변. 아름다운 바다를 배경으로 연인과 함께 로맨틱한 인생샷을 남길 수 있는 최고의 장소입니다. 해변을 거닐며 여유로운 시간을 보내세요.",
+          "name": "아르떼 뮤지엄",
+          "description": "웅장한 공간 속 화려한 색의 향연을 감상하기 좋은 미디어 아트 전시관",
           "image": null,
           "latitude": null,
           "longitude": null
         }},
         {{
           "order": 4,
-          "name": "아르떼 뮤지엄",
-          "description": "웅장한 공간 속 화려한 색의 향연을 감상하기 좋은 미디어 아트 전시관입니다. 환상적인 빛과 소리의 조화 속에서 연인과 특별하고 예술적인 인생샷을 남겨보세요.",
-          "image": null,
-          "latitude": null,
-          "longitude": null
-        }},
-        {{
-          "order": 5,
-          "name": "순두부 젤라또",
-          "description": "채광 좋은 통유리 인테리어가 인상적인 순두부 젤라또 맛집! 이색적인 젤라또를 맛보며 예쁜 인테리어 속에서 달콤한 추억과 함께 감성적인 인생샷을 남기기에 좋습니다.",
+          "name": "샌마르",
+          "description": "맛있는 꼬막피자와 귀여운 인테리어의 조화",
           "image": null,
           "latitude": null,
           "longitude": null

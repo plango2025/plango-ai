@@ -8,7 +8,7 @@ import json
 from app.place_intro.services.tour_data_loader import first_tour_data_loader, second_tour_data_loader
 from app.place_intro.services.tour_service import get_preview_info, get_detail_info, get_llm_input
 
-router = APIRouter()
+router = APIRouter(prefix="/api")
 
 @router.get("/tour", response_class=StreamingResponse)
 async def stream_tour_info(keyword: str = Query(..., description="검색 키워드")) -> StreamingResponse:
@@ -80,4 +80,4 @@ async def stream_tour_info(keyword: str = Query(..., description="검색 키워�
         async for chunk in run_detail_and_llm():
             yield chunk
 
-    return StreamingResponse(event_stream(), media_type="application/json")
+    return StreamingResponse(event_stream(), media_type="application/json; charset=utf-8")
